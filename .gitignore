@@ -1,0 +1,5 @@
+data/
+.*
+!.gitignore
+!.gitattributes
+!.gitmodules

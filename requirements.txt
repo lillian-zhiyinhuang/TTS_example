@@ -1,0 +1,43 @@
+# ==============================================================================
+# 檔案：requirements.txt
+# 描述：此專案所需的 Python 套件列表。
+# 安裝指令：pip install -r requirements.txt
+# ==============================================================================
+
+# -- PyTorch 官方套件來源 (針對 CUDA 12.1) --
+# 這一行會告訴 pip 在 PyPI 之外，也到 PyTorch 的官方倉庫尋找套件，
+# 以確保能下載到與 CUDA 12.1 相容的版本。
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# --- 核心科學計算 ---
+# numpy==1.26.4
+
+# --- 核心機器學習套件 ---
+torch==2.3.0
+torchvision==0.18.0
+torchaudio==2.3.0
+
+# --- Hugging Face 生態系 ---
+transformers==4.41.2
+peft==0.11.1
+datasets==2.19.2
+accelerate==1.9.0
+# huggingface-hub==0.23.4
+
+# --- 效能與量化 ---
+bitsandbytes==0.43.1
+# 注意：flash-attn 為可選套件，通常需要從源碼編譯，安裝時間較長。
+# 如果您的硬體支援且需要極致性能，可以取消以下行的註解來安裝。
+# flash-attn==2.5.9
+
+# --- 工具與日誌 ---
+wandb==0.17.0
+pyyaml==6.0.1
+safetensors==0.4.3
+tqdm==4.66.4
+soundfile==0.13.1
+librosa==0.11.0
+snac==1.2.1
+opencc==1.1.9
+pyrubberband==0.4.0
+pyloudnorm==0.1.1

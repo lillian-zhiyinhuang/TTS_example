@@ -1,0 +1,70 @@
+# ==============================================================================
+# 檔案：config.yaml
+# 描述：QLoRA 微調專案的中央組態檔。
+#        所有實驗參數、模型路徑和超參數都在此處定義，
+#        以確保實驗的可重複性和管理的便利性。
+# ==============================================================================
+
+# --- 1. 模型與 Tokenizer 設定 (Model & Tokenizer Configuration) ---
+# 這是整個微調流程的基礎。
+# base_model_id: 指定您要微調的基礎模型。QLoRA 的優勢在於可以直接使用已量化的模型，
+#                或是像此處一樣，在載入時動態進行量化。
+#                `-ft` 版本通常是經過指令微調 (Instruction-Tuning) 的，更適合做為下游任務微調的起點。
+base_model_id: "canopylabs/3b-zh-ft-research_release" 
+
+# tokenizer_id: 指定分詞器的來源。
+#                 至關重要的是，分詞器必須與當初「預訓練」階段所使用的版本完全一致，
+#                 以確保詞彙表 (Vocabulary) 的對應是正確的。
+tokenizer_id: "canopylabs/3b-zh-pretrain-research_release" 
+
+# --- 2. 資料集設定 (Dataset Configuration) ---
+# TTS_dataset: 指定在 Hugging Face Hub 上，您已經過預處理和分詞的資料集名稱。
+#              腳本會自動從此處下載資料。
+TTS_dataset: "your-hf-username/your-dataset-name"
+
+# --- 3. 訓練超參數 (Training Hyperparameters) ---
+# epochs: 整個資料集將被完整訓練的次數。
+epochs: 3
+# batch_size: 單一裝置 (GPU) 在一次前向/反向傳播中處理的樣本數。
+batch_size: 1
+# gradient_accumulation_steps: 梯度累積的步數。
+#                              有效批次大小 (Effective Batch Size) = batch_size * gradient_accumulation_steps
+#                              此設定下，有效批次大小為 1 * 8 = 8。
+gradient_accumulation_steps: 8
+# learning_rate: 學習率，控制模型權重更新的幅度。
+#                微調時通常使用比預訓練小 1-2 個數量級的學習率。
+#                2.0e-5 是 LoRA 微調中一個常見且穩健的起始值。
+learning_rate: 2.0e-5
+# warmup_steps: 在訓練初期，學習率從 0 線性增長到指定 `learning_rate` 所需的步數。
+#               有助於穩定訓練初期的模型更新。
+warmup_steps: 100
+# optim: 優化器。`paged_adamw_8bit` 是 QLoRA 推薦的記憶體高效優化器。
+optim: "paged_adamw_8bit"
+
+# --- 4. LoRA 相關設定 (LoRA-Specific Configuration) ---
+# lora_rank: LoRA 適配器的秩 (r)。這是影響模型容量與參數量的核心超參數。
+lora_rank: 32
+# lora_alpha: LoRA 的縮放因子 (α)。通常設為 rank 的兩倍。
+lora_alpha: 64
+# lora_dropout: 應用於 LoRA 層的 Dropout 比率，防止過擬合。
+lora_dropout: 0.0
+
+# --- 5. 儲存與記錄 (Saving & Logging) ---
+# save_folder: 儲存訓練檢查點 (checkpoints) 和最終模型的本地資料夾名稱。
+save_folder: "checkpoints"
+# save_steps: 每隔多少個訓練步驟，儲存一次模型的檢查點。
+save_steps: 150
+# project_name: (可選) 用於 Weights & Biases (W&B) 專案的名稱。
+project_name: "my-finetune"
+
+# 🔥🔥 每次啟動新訓練前，請務必修改此處！ 🔥🔥
+# run_name: 本次訓練執行的唯一標識符。
+#           這會是 W&B 上的實驗名稱，也是 checkpoint 資料夾中的子目錄名。
+#           強烈建議使用有意義的名稱，例如包含日期、版本或核心參數。
+run_name: "run"
+
+# --- 6. Hugging Face Hub 設定 (Optional: Hugging Face Hub Integration) ---
+# hub_repo_id: (可選) 如果您希望在訓練結束後自動將模型上傳到 Hugging Face Hub，
+#                請在此處填寫您的 `使用者名稱/模型庫名稱`。
+#                如果將此行註解掉或留空，腳本將跳過上傳步驟。
+hub_repo_id: "your-hf-username/your-finetuned-model-name"
